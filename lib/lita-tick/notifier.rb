@@ -1,37 +1,36 @@
 module LitaTick
   class Notifier
-    attr_reader :robot, :redis, :scheduler
+    attr_reader :handler, :redis, :log
 
-    def initialize(robot, redis, scheduler)
-      @robot = robot
-      @scheduler = scheduler
+    def initialize(handler, redis, log)
+      @handler = handler
+      @redis = redis
+      @log = log
     end
 
-    def start
+    def start!(scheduler)
       # scheduler.cron '0 5 * * 1-5' do
       scheduler.cron '*/1 * * * *' do
         remind_users
       end
     end
 
-    def remind_users
-      users.each do |tick_id, user|
-        target = Source.new(user: user['u_id'])
-        robot.send_messages(target, tick_id)
-        log.info "SENDING: #{tick_id} -> #{target}"
-      end
+    def remind!(user, tick_id)
+      redis.hset('users', tick_id, {
+        'user_id' => user.id
+      })
     end
 
-    def remind(user, tick_id)
-      redis.hset('users', tick_id, {
-        user_id: user.id
-      })
+    def users
+      redis.hgetall('users')
     end
 
     private
 
-    def users
-      @users ||= redis.hget('users')
+    def remind_users
+      users.each do |tick_id, data|
+        handler.remind_user(data['user_id'], tick_id)
+      end
     end
   end
 end
