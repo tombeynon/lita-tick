@@ -9,8 +9,7 @@ module LitaTick
     end
 
     def start!(scheduler)
-      # scheduler.cron '0 5 * * 1-5' do
-      scheduler.cron '*/1 * * * *' do
+      scheduler.cron '20 5 * * 1-5' do
         remind_users
       end
     end

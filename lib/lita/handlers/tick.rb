@@ -5,8 +5,8 @@ module Lita
         @scheduler ||= Rufus::Scheduler.new
       end
 
-      route(/^tick remind me (.+)/, :add_reminder, command: true, help: {
-        "tick remind me EMAIL" => "Remind you at the end of the day if you haven't ticked"
+      route(/^remind me to tick (\S+@\S+\.\S+)/, :add_reminder, command: true, help: {
+        "remind me to tick EMAIL" => "Remind you at the end of the day if you haven't ticked"
       })
 
       on :loaded, :start_notifier
@@ -31,10 +31,10 @@ module Lita
         tick_user = LitaTick::User.find(tick_id)
         if tick_user && tick_user.needs_reminding?
           target = Lita::Source.new(user: user_id)
-          robot.send_messages(target, 'Don\'t forget to tick!')
+          robot.send_messages(target, "Don't forget to tick! You've entered #{tick_user.hours_posted_today} hours for today")
         elsif !tick_user
           target = Lita::Source.new(user: user_id)
-          robot.send_messages(target, 'Your tick account seems to have been deleted..')
+          robot.send_messages(target, 'I couldn\'t access your tick account..')
         end
       end
 
