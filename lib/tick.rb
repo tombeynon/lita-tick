@@ -1,7 +1,7 @@
 require 'net/http'
 require "tick/client"
 require "tick/user"
-# require "tick/entry"
+require "tick/entry"
 
 module Tick
   class << self
