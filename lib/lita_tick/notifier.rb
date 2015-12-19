@@ -15,8 +15,8 @@ module LitaTick
     end
 
     def remind!(user, tick_id)
-      redis.hset('users', tick_id, {
-        'user_id' => user.id
+      redis.hset('users', user.id, {
+        'tick_id' => tick_id
       })
     end
 
@@ -27,8 +27,8 @@ module LitaTick
     private
 
     def remind_users
-      users.each do |tick_id, data|
-        handler.remind_user(data['user_id'], tick_id)
+      users.each do |user_id, data|
+        handler.remind_user(user_id, data['tick_id'])
       end
     end
   end
