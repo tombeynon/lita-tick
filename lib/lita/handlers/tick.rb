@@ -9,8 +9,8 @@ module Lita
         "remind me to tick EMAIL" => "Remind you at the end of the day if you haven't ticked"
       })
 
-      route(/^tick stop reminder/, :remove_reminder, command: true, help: {
-        "tick stop reminder" => "Stop reminding you about tick"
+      route(/^stop reminding me to tick/, :remove_reminder, command: true, help: {
+        "stop reminding me to tick" => "Stop reminding you about tick"
       })
 
       on :loaded, :start_notifier
