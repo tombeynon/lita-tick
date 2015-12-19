@@ -8,8 +8,9 @@ module LitaTick
       @log = log
     end
 
-    def start!(scheduler)
-      scheduler.cron '30 17 * * 1-5' do
+    def start!(scheduler, reminder_time='17:20', reminder_days='1-5')
+      time_parts = reminder_time.split(':')
+      scheduler.cron "#{time_parts[1]} #{time_parts[0]} * * #{reminder_days}" do
         remind_users
       end
     end

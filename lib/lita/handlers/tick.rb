@@ -23,10 +23,20 @@ module Lita
 
       on :loaded, :start_notifier
 
+      config :api_token, type: String, required: true
+      config :api_contact, type: String, required: true
+      config :subscription_id, type: String, required: true
+      config :reminder_time, type: String, default: '17:20'
+      config :reminder_days, type: String, default: '1-5'
+
       attr_reader :notifier
 
       def start_notifier(payload)
-        notifier.start!(self.class.scheduler)
+        ::Tick.api_token = config.api_token
+        ::Tick.subscription_id = config.subscription_id
+        ::Tick.api_contact = config.api_contact
+
+        notifier.start!(self.class.scheduler, config.reminder_time, config.reminder_days)
       end
 
       def add_reminder(response)
