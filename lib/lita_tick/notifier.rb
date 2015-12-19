@@ -42,19 +42,19 @@ module LitaTick
       end
     end
 
-    def users
-      redis.hgetall('users').inject({}) do |sum, (user_id, data)|
-        sum[user_id] = JSON.parse(data)
-        sum
+    def remind_users
+      return if stopped?
+      users.each do |user_id, data|
+        handler.remind_user(user_id, data['tick_id'])
       end
     end
 
     private
 
-    def remind_users
-      return if stopped?
-      users.each do |user_id, data|
-        handler.remind_user(user_id, data['tick_id'])
+    def users
+      redis.hgetall('users').inject({}) do |sum, (user_id, data)|
+        sum[user_id] = JSON.parse(data)
+        sum
       end
     end
   end

@@ -5,6 +5,7 @@ Lita.load_locales Dir[File.expand_path(
 )]
 
 require 'rufus-scheduler'
+require 'json'
 require "tick"
 require "lita_tick/notifier"
 require "lita_tick/user"
