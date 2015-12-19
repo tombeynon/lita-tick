@@ -13,6 +13,14 @@ module Lita
         "stop reminding me to tick" => "Stop reminding you about tick"
       })
 
+      route(/^stop tick reminders until (\d{1,2})\/(\d{1,2})\/(\d{4})/, :stop_reminders, command: true, restrict_to: :tick_admins, help: {
+        "stop tick reminders until DATE" => "Stop all reminders until DATE"
+      })
+
+      route(/^resume tick reminders/, :resume_reminders, command: true, restrict_to: :tick_admins, help: {
+        "resume tick reminders" => "Resume all tick reminders"
+      })
+
       on :loaded, :start_notifier
 
       attr_reader :notifier
@@ -37,6 +45,17 @@ module Lita
         else
           response.reply("Chill, you didn't ask me to remind you")
         end
+      end
+
+      def stop_reminders(response)
+        until_date = Date.new(*response.matches[0].reverse.map(&:to_i))
+        notifier.stop_until!(until_date)
+        response.reply("Tick reminders stopped until #{until_date}")
+      end
+
+      def resume_reminders(response)
+        notifier.resume!
+        response.reply("Tick reminders resumed")
       end
 
       def remind_user(user_id, tick_id)

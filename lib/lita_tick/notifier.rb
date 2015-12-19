@@ -20,8 +20,25 @@ module LitaTick
       }.to_json)
     end
 
+    def resume!
+      redis.del('stop_until')
+    end
+
+    def stop_until!(date)
+      redis.set('stop_until', date)
+    end
+
     def forget!(user)
       redis.hdel('users', user.id) > 0
+    end
+
+    def stopped?
+      date = redis.get('stop_until')
+      if date && Date.parse(date) > Date.today
+        return true
+      else
+        return false
+      end
     end
 
     def users
@@ -34,6 +51,7 @@ module LitaTick
     private
 
     def remind_users
+      return if stopped?
       users.each do |user_id, data|
         handler.remind_user(user_id, data['tick_id'])
       end
