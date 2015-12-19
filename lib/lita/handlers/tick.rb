@@ -9,6 +9,10 @@ module Lita
         "remind me to tick EMAIL" => "Remind you at the end of the day if you haven't ticked"
       })
 
+      route(/^tick stop reminder/, :remove_reminder, command: true, help: {
+        "tick stop reminder" => "Stop reminding you about tick"
+      })
+
       on :loaded, :start_notifier
 
       attr_reader :notifier
@@ -24,6 +28,14 @@ module Lita
           response.reply('All set')
         else
           response.reply("I couldn't find that user")
+        end
+      end
+
+      def remove_reminder(response)
+        if notifier.forget!(response.user)
+          response.reply("All done. I was only trying to help")
+        else
+          response.reply("Chill, you didn't ask me to remind you")
         end
       end
 

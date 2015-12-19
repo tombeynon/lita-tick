@@ -20,6 +20,10 @@ module LitaTick
       })
     end
 
+    def forget!(user)
+      redis.hdel('users', user.id) > 0
+    end
+
     def users
       redis.hgetall('users')
     end
