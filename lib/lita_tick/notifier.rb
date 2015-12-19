@@ -17,7 +17,7 @@ module LitaTick
     def remind!(user, tick_id)
       redis.hset('users', user.id, {
         'tick_id' => tick_id
-      })
+      }.to_json)
     end
 
     def forget!(user)
@@ -25,7 +25,10 @@ module LitaTick
     end
 
     def users
-      redis.hgetall('users')
+      redis.hgetall('users').inject({}) do |sum, (user_id, data)|
+        sum[user_id] = JSON.parse(data)
+        sum
+      end
     end
 
     private
