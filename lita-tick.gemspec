@@ -5,8 +5,8 @@ Gem::Specification.new do |spec|
   spec.email         = ["tbeynon@rawnet.com"]
   spec.description   = "Tick reminders for Lita"
   spec.summary       = "Tick reminders for Lita"
-  spec.homepage      = "http://rawnet.com"
-  spec.license       = "Add a license"
+  spec.homepage      = "rawnet.com"
+  spec.license       = "MIT"
   spec.metadata      = { "lita_plugin_type" => "handler" }
 
   spec.files         = `git ls-files`.split($/)
