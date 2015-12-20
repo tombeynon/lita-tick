@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-tick"
-  spec.version       = "0.1.0"
+  spec.version       = "0.9.0"
   spec.authors       = ["Tom Beynon"]
   spec.email         = ["tbeynon@rawnet.com"]
   spec.description   = "Tick reminders for Lita"
