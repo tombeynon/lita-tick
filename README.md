@@ -1,5 +1,8 @@
 # lita-tick
 
+[![Build Status](https://travis-ci.org/tombeynon/lita-tick.png?branch=master)](https://travis-ci.org/tombeynon/lita-tick)
+[![Coverage Status](https://coveralls.io/repos/tombeynon/lita-tick/badge.svg?branch=master&service=github)](https://coveralls.io/github/tombeynon/lita-tick?branch=master)
+
 A Lita handler to remind you fill in your [Tick](http://www.tickspot.com).
 
 ## Installation
