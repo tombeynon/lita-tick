@@ -69,12 +69,13 @@ module Lita
       end
 
       def remind_user(user_id, tick_id)
+        user = Lita::User.find_by_id(user_id)
         tick_user = LitaTick::User.find(tick_id)
         if tick_user && tick_user.needs_reminding?
-          target = Lita::Source.new(user: user_id)
+          target = Lita::Source.new(user: user)
           robot.send_messages(target, "Don't forget to tick! You've entered #{tick_user.hours_posted_today} hours for today")
         elsif !tick_user
-          target = Lita::Source.new(user: user_id)
+          target = Lita::Source.new(user: user)
           robot.send_messages(target, 'I couldn\'t access your tick account..')
         end
       end

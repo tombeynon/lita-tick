@@ -8,6 +8,7 @@ describe Lita::Handlers::Tick, lita_handler: true do
 
   let(:notifier){ double(:notifier) }
   let(:scheduler){ double(:scheduler) }
+  let!(:user){ Lita::User.create(123, name: "Test") }
 
   before do
     robot.config.handlers.tick.api_token = 'API-TOKEN'
@@ -23,13 +24,12 @@ describe Lita::Handlers::Tick, lita_handler: true do
       expect(Tick).to receive(:api_contact=).with('API-CONTACT')
       expect(Tick).to receive(:subscription_id=).with('SUBSCRIPTION-ID')
       expect(notifier).to receive(:start!).with(scheduler, '17:20', '1-5')
-      subject.start_notifier(double(:payload))
+      subject.start_notifier({})
     end
   end
 
   describe '#add_reminder' do
     context 'with a valid tick email' do
-      let(:user){ Lita::User.create(123, name: "Test") }
       let(:tick_user){ double(:tick_user, id: '1') }
 
       it 'sets the reminder and confirms' do
@@ -41,8 +41,6 @@ describe Lita::Handlers::Tick, lita_handler: true do
     end
 
     context 'with an invalid tick email' do
-      let(:user){ Lita::User.create(123, name: "Test") }
-
       it 'sets the reminder and confirms' do
         expect(LitaTick::User).to receive(:find_by_email).with('test@email.com')
         send_command("remind me to tick test@email.com", as: user)
@@ -53,8 +51,6 @@ describe Lita::Handlers::Tick, lita_handler: true do
 
   describe '#remove_reminder' do
     context 'with a reminder set' do
-      let(:user){ Lita::User.create(123, name: "Test") }
-
       it 'removes the reminder and confirms' do
         expect(notifier).to receive(:forget!).with(user).and_return(true)
         send_command("stop reminding me to tick", as: user)
@@ -63,8 +59,6 @@ describe Lita::Handlers::Tick, lita_handler: true do
     end
 
     context 'without a reminder set' do
-      let(:user){ Lita::User.create(123, name: "Test") }
-
       it 'gives sass' do
         expect(notifier).to receive(:forget!).with(user).and_return(false)
         send_command("stop reminding me to tick", as: user)
@@ -74,8 +68,6 @@ describe Lita::Handlers::Tick, lita_handler: true do
   end
 
   describe '#stop_reminders' do
-    let(:user){ Lita::User.create(123, name: "Test") }
-
     it 'stops the reminders and confirms' do
       date = Date.new(2001,1,1)
       expect(Date).to receive(:new).with(2001, 1, 1){ date }
@@ -87,8 +79,6 @@ describe Lita::Handlers::Tick, lita_handler: true do
   end
 
   describe '#resume_reminders' do
-    let(:user){ Lita::User.create(123, name: "Test") }
-
     it 'resumes the reminders and confirms' do
       expect(notifier).to receive(:resume!)
       robot.auth.add_user_to_group!(user, :tick_admins)
@@ -101,12 +91,10 @@ describe Lita::Handlers::Tick, lita_handler: true do
     context 'valid tick user' do
       context 'needs reminding' do
         let(:tick_user){ double(:tick_user, id: '1', needs_reminding?: true, hours_posted_today: 4.0) }
-        let(:source){ double(:source) }
 
         it 'reminds the user' do
           expect(LitaTick::User).to receive(:find).with('1'){ tick_user }
-          expect(Lita::Source).to receive(:new).with({user: 1}){ source }
-          subject.remind_user(1, '1')
+          subject.remind_user(123, '1')
           expect(replies.last).to eq("Don't forget to tick! You've entered 4.0 hours for today")
         end
       end
@@ -116,19 +104,16 @@ describe Lita::Handlers::Tick, lita_handler: true do
 
         it 'doesn\'t send a message' do
           expect(LitaTick::User).to receive(:find).with('1'){ tick_user }
-          subject.remind_user(1, '1')
+          subject.remind_user(123, '1')
           expect(replies.last).to be_nil
         end
       end
     end
 
     context 'invalid tick user' do
-      let(:source){ double(:source) }
-
       it 'reminds the user' do
         expect(LitaTick::User).to receive(:find).with('1'){ nil }
-        expect(Lita::Source).to receive(:new).with({user: 1}){ source }
-        subject.remind_user(1, '1')
+        subject.remind_user(123, '1')
         expect(replies.last).to eq("I couldn't access your tick account..")
       end
     end
