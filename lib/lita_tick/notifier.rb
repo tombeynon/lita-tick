@@ -42,6 +42,15 @@ module LitaTick
       redis.hdel('users', user.id) > 0
     end
 
+    def list
+      users.map do |user_id, data|
+        {
+          id: user_id,
+          tick_id: data['tick_id']
+        }
+      end
+    end
+
     def stopped?
       date = redis.get('stop_until')
       if date && Date.parse(date) > Date.today

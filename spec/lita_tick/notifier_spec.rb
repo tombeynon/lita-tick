@@ -5,6 +5,11 @@ describe LitaTick::Notifier do
   let(:redis){ double(:redis) }
   let(:log){ double(:log) }
 
+  let(:users){ {
+    '1' => {'tick_id': 1}.to_json,
+    '2' => {'tick_id': 2}.to_json
+  } }
+
   subject { LitaTick::Notifier.new(handler, redis, log) }
 
   describe '#start!' do
@@ -57,6 +62,15 @@ describe LitaTick::Notifier do
     end
   end
 
+  describe '#list' do
+    before do
+      allow(redis).to receive(:hgetall).with('users'){ users }
+    end
+    it 'returns an array containing information about each reminder' do
+      expect(subject.list).to eq([{id: '1', tick_id: 1}, {id: '2', tick_id: 2}])
+    end
+  end
+
   describe '#stopped?' do
     context 'stop_until in the future' do
       it 'returns true' do
@@ -81,10 +95,6 @@ describe LitaTick::Notifier do
   end
 
   context 'sending' do
-    let(:users){ {
-      '1' => {'tick_id': 1}.to_json,
-      '2' => {'tick_id': 2}.to_json
-    } }
     before do
       allow(redis).to receive(:hgetall).with('users'){ users }
     end

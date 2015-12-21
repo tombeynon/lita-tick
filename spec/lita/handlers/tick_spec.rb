@@ -4,6 +4,7 @@ describe Lita::Handlers::Tick, lita_handler: true do
   it { is_expected.to route_command('remind me to tick user@email.com').to(:add_reminder) }
   it { is_expected.to route_command('stop reminding me to tick').to(:remove_reminder) }
   it { is_expected.to route_command('send tick reminders').to(:send_reminders).with_authorization_for(:tick_admins) }
+  it { is_expected.to route_command('list tick reminders').to(:list_reminders).with_authorization_for(:tick_admins) }
   it { is_expected.to route_command('stop tick reminders until 1/2/2016').to(:stop_reminders).with_authorization_for(:tick_admins) }
   it { is_expected.to route_command('resume tick reminders').to(:resume_reminders).with_authorization_for(:tick_admins) }
 
@@ -78,6 +79,21 @@ describe Lita::Handlers::Tick, lita_handler: true do
         expect(notifier).to receive(:send!)
         send_command("send tick reminders", as: user)
         expect(replies.last).to eq("Tick reminders sent")
+      end
+    end
+
+    describe '#list_reminders' do
+      before do
+        Lita::User.create(1, name: "Test 1")
+        Lita::User.create(2, name: "Test 2")
+        allow(LitaTick::User).to receive(:find).with(11){ double(email: 'tick_1@email.com') }
+        allow(LitaTick::User).to receive(:find).with(22){ double(email: 'tick_2@email.com') }
+      end
+
+      it 'lists the reminders' do
+        expect(notifier).to receive(:list){ [{id: 1, tick_id: 11}, {id: 2, tick_id: 22}] }
+        send_command("list tick reminders", as: user)
+        expect(replies.last).to eq("Test 1: tick_1@email.com\nTest 2: tick_2@email.com")
       end
     end
 

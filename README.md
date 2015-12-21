@@ -43,6 +43,10 @@ lita stop reminding me to tick
 ### Admin functions available to tick_admins 
 
 ```
+lita list tick reminders
+#=> James Bond: 007@bss.com
+    Miss Moneypenny: mmoneypenny@bss.com
+
 lita send tick reminders
 #=> Tick reminders sent   # doesn't affect the schedule
 

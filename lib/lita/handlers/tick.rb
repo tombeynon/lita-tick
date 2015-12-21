@@ -17,6 +17,10 @@ module Lita
         "send tick reminders" => "Send all tick reminders now"
       })
 
+      route(/^list tick reminders/, :list_reminders, command: true, restrict_to: :tick_admins, help: {
+        "list tick reminders" => "Show all tick reminders"
+      })
+
       route(/^stop tick reminders until (\d{1,2})\/(\d{1,2})\/(\d{4})/, :stop_reminders, command: true, restrict_to: :tick_admins, help: {
         "stop tick reminders until DATE" => "Stop all reminders until DATE"
       })
@@ -67,6 +71,10 @@ module Lita
         response.reply("Tick reminders sent")
       end
 
+      def list_reminders(response)
+        response.reply format_reminders
+      end
+
       def stop_reminders(response)
         until_date = Date.new(*response.matches[0].reverse.map(&:to_i))
         notifier.stop_until!(until_date)
@@ -91,6 +99,14 @@ module Lita
       end
 
       private
+
+      def format_reminders
+        notifier.list.map do |reminder|
+          user = Lita::User.find_by_id(reminder[:id])
+          tick_user = LitaTick::User.find(reminder[:tick_id])
+          "#{user.name}: #{tick_user.email}"
+        end.join("\n")
+      end
 
       def notifier
         @notifier ||= LitaTick::Notifier.new(self, redis, log)
