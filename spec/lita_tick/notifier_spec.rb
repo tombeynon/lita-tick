@@ -80,27 +80,48 @@ describe LitaTick::Notifier do
     end
   end
 
-  describe '#remind_users' do
-    context 'not stopped' do
-      let(:users){ {
-        '1' => {'tick_id': 1}.to_json,
-        '2' => {'tick_id': 2}.to_json
-      }
-      }
-      it 'notifies the handler to remind the users' do
-        expect(redis).to receive(:get).with('stop_until')
-        expect(redis).to receive(:hgetall).with('users'){ users }
-        expect(handler).to receive(:remind_user).with('1', 1)
-        expect(handler).to receive(:remind_user).with('2', 2)
-        subject.remind_users
+  context 'sending' do
+    let(:users){ {
+      '1' => {'tick_id': 1}.to_json,
+      '2' => {'tick_id': 2}.to_json
+    } }
+    before do
+      allow(redis).to receive(:hgetall).with('users'){ users }
+    end
+    describe '#send' do
+      context 'not stopped' do
+        it 'notifies the handler to remind the users' do
+          expect(redis).to receive(:get).with('stop_until')
+          expect(handler).to receive(:remind_user).with('1', 1)
+          expect(handler).to receive(:remind_user).with('2', 2)
+          subject.send
+        end
+      end
+
+      context 'stopped' do
+        it 'doesn\'t notify the handler' do
+          expect(redis).to receive(:get).with('stop_until'){ (Date.today + 1).to_s }
+          expect(handler).to_not receive(:remind_user)
+          subject.send
+        end
       end
     end
 
-    context 'stopped' do
-      it 'doesn\'t notify the handler' do
-        expect(redis).to receive(:get).with('stop_until'){ (Date.today + 1).to_s }
-        expect(handler).to_not receive(:remind_user)
-        subject.remind_users
+    describe '#send!' do
+      context 'not stopped' do
+        it 'notifies the handler to remind the users' do
+          expect(handler).to receive(:remind_user).with('1', 1)
+          expect(handler).to receive(:remind_user).with('2', 2)
+          subject.send!
+        end
+      end
+
+      context 'stopped' do
+        it 'notifies the handler to remind the users' do
+          expect(handler).to receive(:remind_user).with('1', 1)
+          expect(handler).to receive(:remind_user).with('2', 2)
+          subject.send!
+        end
       end
     end
   end

@@ -11,7 +11,7 @@ module LitaTick
     def start!(scheduler, reminder_time='17:20', reminder_days='1-5')
       time_parts = reminder_time.split(':')
       scheduler.cron "#{time_parts[1]} #{time_parts[0]} * * #{reminder_days}" do
-        remind_users
+        send
       end
     end
 
@@ -21,12 +21,21 @@ module LitaTick
       }.to_json)
     end
 
-    def resume!
-      redis.del('stop_until')
+    def send
+      return if stopped?
+      send!
+    end
+
+    def send!
+      send_reminders
     end
 
     def stop_until!(date)
       redis.set('stop_until', date)
+    end
+
+    def resume!
+      redis.del('stop_until')
     end
 
     def forget!(user)
@@ -42,14 +51,13 @@ module LitaTick
       end
     end
 
-    def remind_users
-      return if stopped?
+    private
+
+    def send_reminders
       users.each do |user_id, data|
         handler.remind_user(user_id, data['tick_id'])
       end
     end
-
-    private
 
     def users
       redis.hgetall('users').inject({}) do |sum, (user_id, data)|

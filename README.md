@@ -42,6 +42,9 @@ lita stop reminding me to tick
 ### Admin functions available to tick_admins 
 
 ```
+lita send tick reminders
+#=> Tick reminders sent   # doesn't affect the schedule
+
 lita stop tick reminders until 1/1/2016
 #=> Tick reminders stopped until 2016-01-01
 

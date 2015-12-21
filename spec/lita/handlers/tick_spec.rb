@@ -3,6 +3,7 @@ require "spec_helper"
 describe Lita::Handlers::Tick, lita_handler: true do
   it { is_expected.to route_command('remind me to tick user@email.com').to(:add_reminder) }
   it { is_expected.to route_command('stop reminding me to tick').to(:remove_reminder) }
+  it { is_expected.to route_command('send tick reminders').to(:send_reminders).with_authorization_for(:tick_admins) }
   it { is_expected.to route_command('stop tick reminders until 1/2/2016').to(:stop_reminders).with_authorization_for(:tick_admins) }
   it { is_expected.to route_command('resume tick reminders').to(:resume_reminders).with_authorization_for(:tick_admins) }
 
@@ -67,23 +68,35 @@ describe Lita::Handlers::Tick, lita_handler: true do
     end
   end
 
-  describe '#stop_reminders' do
-    it 'stops the reminders and confirms' do
-      date = Date.new(2001,1,1)
-      expect(Date).to receive(:new).with(2001, 1, 1){ date }
-      expect(notifier).to receive(:stop_until!).with(date)
+  context 'tick_admins' do
+    before do
       robot.auth.add_user_to_group!(user, :tick_admins)
-      send_command("stop tick reminders until 1/1/2001", as: user)
-      expect(replies.last).to eq("Tick reminders stopped until 2001-01-01")
     end
-  end
 
-  describe '#resume_reminders' do
-    it 'resumes the reminders and confirms' do
-      expect(notifier).to receive(:resume!)
-      robot.auth.add_user_to_group!(user, :tick_admins)
-      send_command("resume tick reminders", as: user)
-      expect(replies.last).to eq("Tick reminders resumed")
+    describe '#send_reminders' do
+      it 'sends the reminders and confirms' do
+        expect(notifier).to receive(:send!)
+        send_command("send tick reminders", as: user)
+        expect(replies.last).to eq("Tick reminders sent")
+      end
+    end
+
+    describe '#stop_reminders' do
+      it 'stops the reminders and confirms' do
+        date = Date.new(2001,1,1)
+        expect(Date).to receive(:new).with(2001, 1, 1){ date }
+        expect(notifier).to receive(:stop_until!).with(date)
+        send_command("stop tick reminders until 1/1/2001", as: user)
+        expect(replies.last).to eq("Tick reminders stopped until 2001-01-01")
+      end
+    end
+
+    describe '#resume_reminders' do
+      it 'resumes the reminders and confirms' do
+        expect(notifier).to receive(:resume!)
+        send_command("resume tick reminders", as: user)
+        expect(replies.last).to eq("Tick reminders resumed")
+      end
     end
   end
 

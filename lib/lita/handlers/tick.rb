@@ -13,6 +13,10 @@ module Lita
         "stop reminding me to tick" => "Stop reminding you about tick"
       })
 
+      route(/^send tick reminders/, :send_reminders, command: true, restrict_to: :tick_admins, help: {
+        "send tick reminders" => "Send all tick reminders now"
+      })
+
       route(/^stop tick reminders until (\d{1,2})\/(\d{1,2})\/(\d{4})/, :stop_reminders, command: true, restrict_to: :tick_admins, help: {
         "stop tick reminders until DATE" => "Stop all reminders until DATE"
       })
@@ -55,6 +59,11 @@ module Lita
         else
           response.reply("Chill, you didn't ask me to remind you")
         end
+      end
+
+      def send_reminders(response)
+        notifier.send!
+        response.reply("Tick reminders sent")
       end
 
       def stop_reminders(response)
