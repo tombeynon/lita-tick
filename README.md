@@ -20,6 +20,7 @@ Lita.configure do |config|
   config.handlers.tick.api_token = 'ADMIN API TOKEN'
   config.handlers.tick.subscription_id = 'SUBSCRIPTION ID'
   config.handlers.tick.api_contact = 'API CONTACT EMAIL'
+  config.handlers.tick.hours_needed = 5
   config.handlers.tick.reminder_time = '17:20'
   config.handlers.tick.reminder_days = '1-5'
 end

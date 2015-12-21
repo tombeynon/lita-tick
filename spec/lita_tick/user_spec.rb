@@ -16,21 +16,6 @@ describe LitaTick::User do
     }).and_return(entries)
   end
 
-  describe '#needs_reminding?' do
-    context 'does need reminding' do
-      it 'returns true' do
-        expect(subject.needs_reminding?).to eq(true)
-      end
-    end
-
-    context 'doesn\'t need reminding' do
-      it 'returns false' do
-        entries << double(:entry, hours: 3.0)
-        expect(subject.needs_reminding?).to eq(false)
-      end
-    end
-  end
-
   describe '#hours_posted_today' do
     it 'returns the sum of the entry hours' do
       expect(subject.hours_posted_today).to eq(3.0)

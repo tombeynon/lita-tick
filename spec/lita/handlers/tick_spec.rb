@@ -103,7 +103,7 @@ describe Lita::Handlers::Tick, lita_handler: true do
   describe '#remind_user' do
     context 'valid tick user' do
       context 'needs reminding' do
-        let(:tick_user){ double(:tick_user, id: '1', needs_reminding?: true, hours_posted_today: 4.0) }
+        let(:tick_user){ double(:tick_user, id: '1', hours_posted_today: 4.0) }
 
         it 'reminds the user' do
           expect(LitaTick::User).to receive(:find).with('1'){ tick_user }
@@ -113,7 +113,7 @@ describe Lita::Handlers::Tick, lita_handler: true do
       end
 
       context 'doesn\'t need reminding' do
-        let(:tick_user){ double(:tick_user, id: '1', needs_reminding?: false) }
+        let(:tick_user){ double(:tick_user, id: '1', hours_posted_today: 6.0) }
 
         it 'doesn\'t send a message' do
           expect(LitaTick::User).to receive(:find).with('1'){ tick_user }

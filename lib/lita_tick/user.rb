@@ -1,9 +1,5 @@
 module LitaTick
   class User < SimpleDelegator
-    def needs_reminding?
-      hours_posted_today < 5
-    end
-
     def hours_posted_today
       entries_for_today.reduce(0){|sum, e| sum + e.hours }
     end

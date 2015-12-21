@@ -30,6 +30,7 @@ module Lita
       config :api_token, type: String, required: true
       config :api_contact, type: String, required: true
       config :subscription_id, type: String, required: true
+      config :hours_needed, type: Integer, default: 5
       config :reminder_time, type: String, default: '17:20'
       config :reminder_days, type: String, default: '1-5'
 
@@ -80,7 +81,7 @@ module Lita
       def remind_user(user_id, tick_id)
         user = Lita::User.find_by_id(user_id)
         tick_user = LitaTick::User.find(tick_id)
-        if tick_user && tick_user.needs_reminding?
+        if tick_user && needs_reminding?(tick_user)
           target = Lita::Source.new(user: user)
           robot.send_messages(target, "Don't forget to tick! You've entered #{tick_user.hours_posted_today} hours for today")
         elsif !tick_user
@@ -93,6 +94,10 @@ module Lita
 
       def notifier
         @notifier ||= LitaTick::Notifier.new(self, redis, log)
+      end
+
+      def needs_reminding?(tick_user)
+        tick_user.hours_posted_today < config.hours_needed
       end
 
       Lita.register_handler(self)
