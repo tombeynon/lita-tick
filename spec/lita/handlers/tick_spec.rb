@@ -25,7 +25,7 @@ describe Lita::Handlers::Tick, lita_handler: true do
       expect(Tick).to receive(:api_token=).with('API-TOKEN')
       expect(Tick).to receive(:api_contact=).with('API-CONTACT')
       expect(Tick).to receive(:subscription_id=).with('SUBSCRIPTION-ID')
-      expect(notifier).to receive(:start!).with(scheduler, '17:20', '1-5')
+      expect(notifier).to receive(:start!).with(scheduler, '17:20', '1-5', nil)
       subject.start_notifier({})
     end
   end
