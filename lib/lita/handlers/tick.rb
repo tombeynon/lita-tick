@@ -37,6 +37,7 @@ module Lita
       config :hours_needed, type: Integer, default: 5
       config :reminder_time, type: String, default: '17:20'
       config :reminder_days, type: String, default: '1-5'
+      config :reminder_timezone, type: String
 
       attr_reader :notifier
 
@@ -45,7 +46,7 @@ module Lita
         ::Tick.subscription_id = config.subscription_id
         ::Tick.api_contact = config.api_contact
 
-        notifier.start!(self.class.scheduler, config.reminder_time, config.reminder_days)
+        notifier.start!(self.class.scheduler, config.reminder_time, config.reminder_days, config.reminder_timezone)
       end
 
       def add_reminder(response)

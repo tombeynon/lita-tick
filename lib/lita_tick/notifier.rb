@@ -8,9 +8,11 @@ module LitaTick
       @log = log
     end
 
-    def start!(scheduler, reminder_time='17:20', reminder_days='1-5')
+    def start!(scheduler, reminder_time='17:20', reminder_days='1-5', timezone=nil)
       time_parts = reminder_time.split(':')
-      scheduler.cron "#{time_parts[1]} #{time_parts[0]} * * #{reminder_days}" do
+      cron_string = "#{time_parts[1]} #{time_parts[0]} * * #{reminder_days}"
+      cron_string << " #{timezone}" if timezone
+      scheduler.cron cron_string do
         send
       end
     end
